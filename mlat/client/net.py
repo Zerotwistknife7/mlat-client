@@ -55,14 +55,14 @@ class ReconnectingConnection(LoggingMixin, asyncore.dispatcher):
         self.host = host
         self.port = port
         # check port as well, if port doesn't match, could be direct MLAT
-        if self.host == 'feed.adsbexchange.com' and port == 31090:
-            self.adsbexchange = True
+        if self.host == 'feed.adsb.fi' and port == 31090:
+            self.adsb = True
         else:
-            self.adsbexchange = False
-        self.adsbexchangePortIndex = 0
-        self.adsbexchangeHostIndex = 0
-        self.adsbexchangePorts = [ 31090, 64590 ]
-        self.adsbexchangeHosts = [ 'feed1.adsbexchange.com', 'feed2.adsbexchange.com' ]
+            self.adsb = False
+        self.adsbPortIndex = 0
+        self.adsbHostIndex = 0
+        self.adsbPorts = [ 31090, 64590 ]
+        self.adsbHosts = [ 'feed.adsb.fi' ]
         self.addrlist = []
         self.state = 'disconnected'
         self.reconnect_at = None
@@ -139,11 +139,11 @@ class ReconnectingConnection(LoggingMixin, asyncore.dispatcher):
 
             if len(self.addrlist) == 0:
                 # ran out of addresses to try, resolve it again
-                if self.adsbexchange:
-                    self.adsbexchangePortIndex  = (self.adsbexchangePortIndex + 1) % len(self.adsbexchangePorts)
-                    self.adsbexchangeHostIndex  = (self.adsbexchangeHostIndex + 1) % len(self.adsbexchangeHosts)
-                    self.host = self.adsbexchangeHosts[self.adsbexchangeHostIndex];
-                    self.port = self.adsbexchangePorts[self.adsbexchangePortIndex];
+                if self.adsb:
+                    self.adsbPortIndex  = (self.adsbPortIndex + 1) % len(self.adsbPorts)
+                    self.adsbHostIndex  = (self.adsbHostIndex + 1) % len(self.adsbHosts)
+                    self.host = self.adsbHosts[self.adsbHostIndex];
+                    self.port = self.adsbPorts[self.adsbPortIndex];
 
                 self.addrlist = socket.getaddrinfo(host=self.host,
                                                    port=self.port,
